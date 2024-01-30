@@ -10,7 +10,7 @@ app.use(express.json());
 // DocHouse
 // ar6oNsopU4xhueOc
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://DocHouse:ar6oNsopU4xhueOc@cluster0.ezxu64p.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -28,6 +28,8 @@ async function run() {
 
     const testimonialsCollection = client.db('docHouse').collection('testimonials')
     const doctorsCollection = client.db('docHouse').collection('doctors')
+    const doctorsServices = client.db('docHouse').collection('services')
+    const doctorsServiceItems = client.db('docHouse').collection('service_items')
 
     // Testimonials api
 
@@ -45,6 +47,32 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/doctors/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await doctorsCollection.findOne(query);
+      res.send(result)
+    })
+
+    // services api 
+    app.get('/services', async (req, res) => {
+      const services = doctorsServices.find()
+      const result = await services.toArray()
+      res.send(result)
+    })
+
+    // service_item api
+    app.get('/service_items', async (req, res) => {
+      const service_items = doctorsServiceItems.find()
+      const result = await service_items.toArray()
+      res.send(result)
+    })
+    app.get('/service_items/:category', async (req, res) => {
+      const category = req.params.category;
+      const items = doctorsServiceItems.find({ service_category: category });
+      const result = await items.toArray()
+      res.json(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
