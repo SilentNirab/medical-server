@@ -30,6 +30,7 @@ async function run() {
     const doctorsCollection = client.db('docHouse').collection('doctors')
     const doctorsServices = client.db('docHouse').collection('services')
     const doctorsServiceItems = client.db('docHouse').collection('service_items')
+    const doctorsAppontment = client.db('docHouse').collection('appointments')
 
     // Testimonials api
 
@@ -62,17 +63,36 @@ async function run() {
     })
 
     // service_item api
-    app.get('/service_items', async (req, res) => {
-      const service_items = doctorsServiceItems.find()
-      const result = await service_items.toArray()
-      res.send(result)
-    })
+    // app.get('/service_items', async (req, res) => {
+    //   const service_items = doctorsServiceItems.find()
+    //   const result = await service_items.toArray()
+    //   res.send(result)
+    // })
     app.get('/service_items/:category', async (req, res) => {
       const category = req.params.category;
       const items = doctorsServiceItems.find({ service_category: category });
       const result = await items.toArray()
       res.json(result);
     });
+
+    // appointment api
+    app.get('/appointments', async(req, res) => {
+      const appointment = doctorsAppontment.find();
+      const result = await appointment.toArray()
+      res.send(result)
+    })
+
+    app.get('/appointments/:user_email', async (req, res) => {
+      const email = req.params.category;
+      const items = doctorsAppontment.find({ user_email: email });
+      const result = await items.toArray()
+      res.json(result);
+    });
+    app.post('/appointments', async(req, res) => {
+      const appointment = req.body;
+      const result = await doctorsAppontment.insertOne(appointment)
+      res.send(result)
+    })
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
